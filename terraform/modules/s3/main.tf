@@ -90,4 +90,17 @@ resource "aws_iam_policy" "s3_upload_policy" {
 # Output the policy ARN so it can be attached to the IAM user
 output "s3_upload_policy_arn" {
   value = aws_iam_policy.s3_upload_policy.arn
+}
+
+# CORS configuration
+resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
+  bucket = aws_s3_bucket.app_bucket.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "POST", "PUT", "DELETE", "HEAD"]
+    allowed_origins = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
 } 
