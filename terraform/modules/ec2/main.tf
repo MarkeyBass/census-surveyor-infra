@@ -38,6 +38,15 @@ resource "aws_instance" "app_server" {
               systemctl start docker
               systemctl enable docker
               usermod -aG docker ubuntu
+              
+              # Install Docker Compose
+              curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              chmod +x /usr/local/bin/docker-compose
+              ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+              
+              # Verify installations
+              docker --version
+              docker-compose --version
               EOF
 
   tags = {
