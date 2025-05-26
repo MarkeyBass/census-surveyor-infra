@@ -22,4 +22,20 @@ output "s3_bucket" {
     arn            = module.s3.bucket_arn
     domain_name    = module.s3.bucket_domain_name
   }
+}
+
+output "ec2_elastic_ip" {
+  description = "The Elastic IP address of the EC2 instance"
+  value       = module.ec2.elastic_ip
+}
+
+output "ec2_instance_id" {
+  description = "The ID of the EC2 instance"
+  value       = module.ec2.instance_id
+}
+
+output "ec2_private_key" {
+  description = "The private SSH key for connecting to the EC2 instance"
+  value       = module.ec2.private_key
+  sensitive   = true
 } 

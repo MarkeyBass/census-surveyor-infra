@@ -11,15 +11,22 @@ module "s3" {
   environment = var.environment
 }
 
-# This will be used later for VPC and EC2
-# module "vpc" {
-#   source = "../../modules/vpc"
-#   ...
-# }
+module "vpc" {
+  source = "../../modules/vpc"
 
-# module "ec2" {
-#   source = "../../modules/ec2"
-#   ...
-# }
+  environment = var.environment
+  vpc_cidr    = "10.0.0.0/16"
+}
+
+module "ec2" {
+  source = "../../modules/ec2"
+
+  environment        = var.environment
+  subnet_id         = module.vpc.public_subnet_ids[0]
+  security_group_id = module.vpc.ec2_security_group_id
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  alb_security_group_id = module.vpc.alb_security_group_id
+}
 
 data "aws_caller_identity" "current" {} 
