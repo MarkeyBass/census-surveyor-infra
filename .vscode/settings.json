@@ -1,4 +1,4 @@
-{  
+{
   "terminal.integrated.tabs.enabled": true,
   "restoreTerminals.terminals": [
     {
@@ -11,9 +11,19 @@
     {
       "splitTerminals": [
         {
-          "name": "Terraform Dev",
+          "name": "S3 Dev",
           "commands": [
-            "cd terraform/environments/dev",
+            "cd terraform-s3/environments/dev",
+          ]
+        },
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "Compute Dev",
+          "commands": [
+            "cd terraform-compute/environments/dev",
           ]
         }
       ]
