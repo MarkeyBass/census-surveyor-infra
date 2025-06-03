@@ -29,6 +29,11 @@ variable "alb_security_group_id" {
   type        = string
 }
 
+variable "vpc_security_group_id" {
+  description = "The ID of the VPC security group to attach to the EC2 instance"
+  type        = string
+}
+
 # Optional Variables with Defaults
 variable "instance_type" {
   description = "EC2 instance type"

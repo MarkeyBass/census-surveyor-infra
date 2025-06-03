@@ -31,7 +31,7 @@ resource "aws_instance" "app_server" {
   subnet_id     = var.subnet_id
   key_name      = var.ssh_key_name != null ? var.ssh_key_name : aws_key_pair.generated_key[0].key_name
 
-  vpc_security_group_ids = [var.security_group_id]
+  vpc_security_group_ids = [var.vpc_security_group_id]
 
   user_data = <<-EOF
               #!/bin/bash
@@ -68,68 +68,6 @@ resource "aws_instance" "app_server" {
 
 # Get current AWS region
 data "aws_region" "current" {}
-
-resource "aws_security_group" "ec2_sg" {
-  name        = "${var.environment}-ec2-app-sg"
-  description = "Security group for EC2 instance running Docker applications"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTP access"
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTPS access"
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "SSH access"
-  }
-
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Client application"
-  }
-
-  ingress {
-    from_port   = 8000
-    to_port     = 8000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Server application"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(
-    {
-      Name        = "${var.environment}-ec2-app-sg"
-      Environment = var.environment
-      Purpose     = "Docker applications"
-    },
-    var.tags
-  )
-}
 
 resource "aws_eip" "app_eip" {
   depends_on = [
