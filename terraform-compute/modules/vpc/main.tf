@@ -108,22 +108,11 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name        = "${var.environment}-ec2-sg"
-    Environment = var.environment
-  }
-}
-
-# Route 53 Hosted Zone
-resource "aws_route53_zone" "main" {
-  name = "markeybass.net"
-}
-
-# DNS A Record for the app subdomain
-resource "aws_route53_record" "app" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "app.markeybass.net"
-  type    = "A"
-  ttl     = "300"
-  records = [var.elastic_ip]
+  tags = merge(
+    {
+      Name        = "${var.environment}-ec2-sg"
+      Environment = var.environment
+    },
+    var.tags
+  )
 } 

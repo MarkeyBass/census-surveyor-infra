@@ -48,3 +48,5 @@ terraform.rc
 .env.local
 
 notes.md
+
+Confy-IaC/

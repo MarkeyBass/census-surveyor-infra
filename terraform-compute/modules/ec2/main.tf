@@ -1,10 +1,10 @@
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical
+  owners      = [var.ami_owner]
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+    values = [var.ami_name_pattern]
   }
 
   filter {
@@ -14,20 +14,22 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "tls_private_key" "ssh_key" {
+  count     = var.ssh_key_name == null ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "generated_key" {
+  count      = var.ssh_key_name == null ? 1 : 0
   key_name   = "${var.environment}-key"
-  public_key = tls_private_key.ssh_key.public_key_openssh
+  public_key = tls_private_key.ssh_key[0].public_key_openssh
 }
 
 resource "aws_instance" "app_server" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.small"
+  instance_type = var.instance_type
   subnet_id     = var.subnet_id
-  key_name      = aws_key_pair.generated_key.key_name
+  key_name      = var.ssh_key_name != null ? var.ssh_key_name : aws_key_pair.generated_key[0].key_name
 
   vpc_security_group_ids = [var.security_group_id]
 
@@ -53,15 +55,15 @@ resource "aws_instance" "app_server" {
   # Force recreation when user_data changes
   lifecycle {
     create_before_destroy = true
-    replace_triggered_by = [
-      aws_instance.app_server.user_data
-    ]
   }
 
-  tags = {
-    Name        = "${var.environment}-app-server"
-    Environment = var.environment
-  }
+  tags = merge(
+    {
+      Name        = "${var.environment}-app-server"
+      Environment = var.environment
+    },
+    var.tags
+  )
 }
 
 # Get current AWS region
@@ -72,21 +74,22 @@ resource "aws_security_group" "ec2_sg" {
   description = "Security group for EC2 instance running Docker applications"
   vpc_id      = var.vpc_id
 
-  # ingress {
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  #   description = "HTTP access"
-  # }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP access"
+  }
 
-  # ingress {
-  #   from_port   = 443
-  #   to_port     = 443
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  #   description = "HTTPS access"
-  # }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS access"
+  }
+
   ingress {
     from_port   = 22
     to_port     = 22
@@ -118,19 +121,29 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name        = "${var.environment}-ec2-app-sg"
-    Environment = var.environment
-    Purpose     = "Docker applications"
-  }
+  tags = merge(
+    {
+      Name        = "${var.environment}-ec2-app-sg"
+      Environment = var.environment
+      Purpose     = "Docker applications"
+    },
+    var.tags
+  )
 }
 
 resource "aws_eip" "app_eip" {
+  depends_on = [
+    aws_instance.app_server
+  ]
+  
   instance = aws_instance.app_server.id
   domain   = "vpc"
 
-  tags = {
-    Name        = "${var.environment}-app-eip"
-    Environment = var.environment
-  }
+  tags = merge(
+    {
+      Name        = "${var.environment}-app-eip"
+      Environment = var.environment
+    },
+    var.tags
+  )
 }

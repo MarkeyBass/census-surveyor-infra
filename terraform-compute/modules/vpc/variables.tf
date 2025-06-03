@@ -1,3 +1,4 @@
+# Required Variables
 variable "environment" {
   description = "Environment name"
   type        = string
@@ -6,9 +7,9 @@ variable "environment" {
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
   type        = string
-  default     = "10.0.0.0/16"
 }
 
+# Optional Variables with Defaults
 variable "public_subnets_cidr" {
   description = "CIDR blocks for public subnets"
   type        = list(string)
@@ -21,7 +22,8 @@ variable "availability_zones" {
   default     = ["us-west-2a", "us-west-2b"]
 }
 
-variable "elastic_ip" {
-  description = "The Elastic IP address to use for DNS records"
-  type        = string
+variable "tags" {
+  description = "Additional tags for VPC resources"
+  type        = map(string)
+  default     = {}
 } 
