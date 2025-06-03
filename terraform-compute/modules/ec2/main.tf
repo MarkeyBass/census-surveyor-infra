@@ -85,3 +85,17 @@ resource "aws_eip" "app_eip" {
     var.tags
   )
 }
+
+# Attach EC2 instance to frontend target group
+resource "aws_lb_target_group_attachment" "frontend" {
+  target_group_arn = var.frontend_target_group_arn
+  target_id        = aws_instance.app_server.id
+  port             = 3000
+}
+
+# Attach EC2 instance to backend target group
+resource "aws_lb_target_group_attachment" "backend" {
+  target_group_arn = var.backend_target_group_arn
+  target_id        = aws_instance.app_server.id
+  port             = 8000
+}

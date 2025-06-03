@@ -8,6 +8,11 @@ module "vpc" {
   source      = "../../modules/vpc"
   environment = var.environment
   vpc_cidr    = var.vpc_cidr
+  certificate_arn = module.route53.certificate_arn
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 module "ec2" {
@@ -22,6 +27,8 @@ module "ec2" {
   alb_security_group_id = module.vpc.alb_security_group_id
   instance_type         = var.instance_type
   ssh_key_name          = var.ssh_key_name
+  frontend_target_group_arn = module.vpc.frontend_target_group_arn
+  backend_target_group_arn = module.vpc.backend_target_group_arn
 
   tags = var.tags
 }
@@ -31,7 +38,8 @@ module "route53" {
 
   environment = var.environment
   domain_name = var.domain_name
-  elastic_ip  = module.ec2.elastic_ip
+  alb_dns_name = module.vpc.alb_dns_name
+  alb_zone_id = module.vpc.alb_zone_id
   tags        = var.tags
 }
 

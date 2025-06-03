@@ -26,4 +26,9 @@ variable "tags" {
   description = "Additional tags for VPC resources"
   type        = map(string)
   default     = {}
+}
+
+variable "certificate_arn" {
+  description = "ARN of the ACM certificate for SSL termination"
+  type        = string
 } 

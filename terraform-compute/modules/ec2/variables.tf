@@ -63,4 +63,14 @@ variable "tags" {
   description = "Additional tags for the EC2 instance"
   type        = map(string)
   default     = {}
+}
+
+variable "frontend_target_group_arn" {
+  description = "ARN of the frontend target group"
+  type        = string
+}
+
+variable "backend_target_group_arn" {
+  description = "ARN of the backend target group"
+  type        = string
 } 
