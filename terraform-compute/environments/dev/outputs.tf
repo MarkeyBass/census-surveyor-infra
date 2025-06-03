@@ -14,6 +14,16 @@ output "aws_user_id" {
   value       = data.aws_caller_identity.current.user_id
 }
 
+# Route53 Information
+output "route53_zone_id" {
+  description = "The ID of the Route53 hosted zone"
+  value       = module.route53.zone_id
+}
+
+output "route53_name_servers" {
+  description = "The name servers for the Route53 hosted zone"
+  value       = module.route53.name_servers
+}
 
 output "ec2_elastic_ip" {
   description = "The Elastic IP address of the EC2 instance"

@@ -50,3 +50,5 @@ terraform.rc
 notes.md
 
 Confy-IaC/
+
+*.pem
